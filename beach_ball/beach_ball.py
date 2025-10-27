@@ -25,6 +25,7 @@ from qgis.core import QgsProject, QgsField, Qgis, QgsSvgMarkerSymbolLayer, QgsMa
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, QVariant
 from qgis.PyQt.QtGui import QIcon, QColor
 from qgis.PyQt.QtWidgets import QAction, QFileDialog, QMessageBox
+from qgis.core import QgsVectorLayer
 import processing
 
 # Initialize Qt resources from file resources.py
@@ -229,6 +230,8 @@ class BeachBall:
             layer = self.dlg.comboBox.currentData()
             if layer == None: # Invalid layer
                 return
+            if not isinstance(layer, QgsVectorLayer):
+                return
             fields = layer.fields().names()
             # Populate the comboBox with names of the fields
             self.dlg.comboBox_2.addItems(fields)
@@ -293,6 +296,30 @@ class BeachBall:
             clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.String)])
             clone_layer.updateFields()
             id_new_col= clone_layer.dataProvider().fieldNameIndex(field_name)
+            field_name = "Ptrend"
+            while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
+                field_name = field_name +'_'
+            clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
+            clone_layer.updateFields()
+            id_Ptrend= clone_layer.dataProvider().fieldNameIndex(field_name)
+            field_name = "Pplunge"
+            while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
+                field_name = field_name +'_'
+            clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
+            clone_layer.updateFields()
+            id_Pplunge= clone_layer.dataProvider().fieldNameIndex(field_name)
+            field_name = "Ttrend"
+            while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
+                field_name = field_name +'_'
+            clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
+            clone_layer.updateFields()
+            id_Ttrend= clone_layer.dataProvider().fieldNameIndex(field_name)
+            field_name = "Tplunge"
+            while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
+                field_name = field_name +'_'
+            clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
+            clone_layer.updateFields()
+            id_Tplunge= clone_layer.dataProvider().fieldNameIndex(field_name)
             field_name = "SVGpath"
             while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
                 field_name = field_name +'_'
@@ -354,6 +381,24 @@ class BeachBall:
                     T_osa[2] = -1*T_osa[2]
                 P_theta = 90-(np.arccos(np.abs(P_osa[2]))*180.0)/np.pi
                 T_theta = 90-(np.arccos(np.abs(T_osa[2]))*180.0)/np.pi
+                angle = (np.arctan(np.abs(P_osa[0]/P_osa[1]))*180.0)/np.pi
+                if P_osa[0] > 0 and P_osa[1] > 0: 
+                    P_azimuth = angle
+                elif P_osa[0] > 0 and P_osa[1] < 0:
+                    P_azimuth = 180 - angle
+                elif P_osa[0] < 0 and P_osa[1] < 0:
+                    P_azimuth = angle + 180
+                elif P_osa[0] < 0 and P_osa[1] > 0:
+                    P_azimuth = 360 - angle
+                angle_2 = (np.arctan(np.abs(T_osa[0]/T_osa[1]))*180.0)/np.pi
+                if T_osa[0] > 0 and T_osa[1] > 0:
+                    T_azimuth = angle_2
+                elif T_osa[0] > 0 and T_osa[1] < 0:
+                    T_azimuth = 180 - angle_2
+                elif T_osa[0] < 0 and T_osa[1] < 0:
+                    T_azimuth = angle_2 + 180
+                elif T_osa[0] < 0 and T_osa[1] > 0:
+                    T_azimuth = 360 - angle_2
                 if P_theta>=52 and T_theta<=35:
                     kin='NF'
                     col = NF_col
@@ -376,7 +421,28 @@ class BeachBall:
                     kin='UK'
                     col = 'grey'
                 # Update new field
+                for val in [np.nan, "", None, np.inf]:
+                    if P_azimuth == val or float(P_azimuth) == val:
+                        P_azimuth = None
+                    else:
+                        P_azimuth = float(P_azimuth)
+                    if P_theta == val or float(P_theta) == val:
+                        P_theta = None
+                    else:
+                        P_theta = float(P_theta)
+                    if T_azimuth == val or float(T_azimuth) == val:
+                        T_azimuth = None
+                    else:
+                        T_azimuth = float(T_azimuth)
+                    if T_theta == val or float(T_theta) == val:
+                        T_theta = None
+                    else:
+                        T_theta = float(T_theta)
                 clone_layer.changeAttributeValue(feature.id(), id_new_col, kin)
+                clone_layer.changeAttributeValue(feature.id(), id_Ptrend, P_azimuth)
+                clone_layer.changeAttributeValue(feature.id(), id_Pplunge, P_theta)
+                clone_layer.changeAttributeValue(feature.id(), id_Ttrend, T_azimuth)
+                clone_layer.changeAttributeValue(feature.id(), id_Tplunge, T_theta)
                 # Plotting beachball
                 svg_file = f'{output_path}/bb_svg/{id_v}.svg'
                 clone_layer.changeAttributeValue(feature.id(), id_svg_col, svg_file)
@@ -390,8 +456,6 @@ class BeachBall:
             symbol.changeSymbolLayer(0, svgLayer)
             clone_layer.renderer().setSymbol(symbol)
             clone_layer.triggerRepaint()
-
-
 
             self.iface.messageBar().pushMessage("BeachBall computed",
                 level=Qgis.Success, duration=3)
