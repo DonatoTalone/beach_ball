@@ -372,33 +372,19 @@ class BeachBall:
                 P_osa = np.subtract(n, u) / np.linalg.norm(np.subtract(n, u))
                 T_osa = np.add(n, u) / np.linalg.norm(np.add(n, u))
                 if P_osa[2] > 0:
-                    P_osa[0] = -1*P_osa[0]
-                    P_osa[1] = -1*P_osa[1]
-                    P_osa[2] = -1*P_osa[2]
-                if T_osa[0] > 0:
-                    T_osa[0] = -1*T_osa[0]
-                    T_osa[1] = -1*T_osa[1]
-                    T_osa[2] = -1*T_osa[2]
-                P_theta = 90-(np.arccos(np.abs(P_osa[2]))*180.0)/np.pi
-                T_theta = 90-(np.arccos(np.abs(T_osa[2]))*180.0)/np.pi
-                angle = (np.arctan(np.abs(P_osa[0]/P_osa[1]))*180.0)/np.pi
-                if P_osa[0] > 0 and P_osa[1] > 0: 
-                    P_azimuth = angle
-                elif P_osa[0] > 0 and P_osa[1] < 0:
-                    P_azimuth = 180 - angle
-                elif P_osa[0] < 0 and P_osa[1] < 0:
-                    P_azimuth = angle + 180
-                elif P_osa[0] < 0 and P_osa[1] > 0:
-                    P_azimuth = 360 - angle
-                angle_2 = (np.arctan(np.abs(T_osa[0]/T_osa[1]))*180.0)/np.pi
-                if T_osa[0] > 0 and T_osa[1] > 0:
-                    T_azimuth = angle_2
-                elif T_osa[0] > 0 and T_osa[1] < 0:
-                    T_azimuth = 180 - angle_2
-                elif T_osa[0] < 0 and T_osa[1] < 0:
-                    T_azimuth = angle_2 + 180
-                elif T_osa[0] < 0 and T_osa[1] > 0:
-                    T_azimuth = 360 - angle_2
+                    P_osa = -P_osa
+                    correctP = 0
+                else:
+                    correctP = 180
+                if T_osa[2] > 0:
+                    T_osa = -T_osa
+                    correctT = 0
+                else:
+                    correctT = 180
+                P_theta = 90.0 - np.degrees(np.arccos(np.abs(P_osa[2])))
+                T_theta = 90.0 - np.degrees(np.arccos(np.abs(T_osa[2])))
+                P_azimuth = (correctP + (np.degrees(np.arctan2(P_osa[1], P_osa[0])) + 360.0)) % 360.0
+                T_azimuth = (correctT + (np.degrees(np.arctan2(T_osa[1], T_osa[0])) + 360.0)) % 360.0
                 if P_theta>=52 and T_theta<=35:
                     kin='NF'
                     col = NF_col
@@ -439,10 +425,10 @@ class BeachBall:
                     else:
                         T_theta = float(T_theta)
                 clone_layer.changeAttributeValue(feature.id(), id_new_col, kin)
-                clone_layer.changeAttributeValue(feature.id(), id_Ptrend, P_azimuth)
-                clone_layer.changeAttributeValue(feature.id(), id_Pplunge, P_theta)
-                clone_layer.changeAttributeValue(feature.id(), id_Ttrend, T_azimuth)
-                clone_layer.changeAttributeValue(feature.id(), id_Tplunge, T_theta)
+                clone_layer.changeAttributeValue(feature.id(), id_Ptrend, round(P_azimuth,2))
+                clone_layer.changeAttributeValue(feature.id(), id_Pplunge, round(P_theta,2))
+                clone_layer.changeAttributeValue(feature.id(), id_Ttrend, round(T_azimuth,2))
+                clone_layer.changeAttributeValue(feature.id(), id_Tplunge, round(T_theta,2))
                 # Plotting beachball
                 svg_file = f'{output_path}/bb_svg/{id_v}.svg'
                 clone_layer.changeAttributeValue(feature.id(), id_svg_col, svg_file)
