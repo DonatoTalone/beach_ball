@@ -361,29 +361,33 @@ class BeachBall:
                     beachball([0, 0, 0], size=0, linewidth=0, facecolor='white', outfile=svg_file)
                     nvi += 0
                     continue
-                n1 = -1*np.sin(dip*np.pi/180.0)*np.sin(strike*np.pi/180.0)
-                n2 = np.sin(dip*np.pi/180.0)*np.cos(strike*np.pi/180.0)
-                n3 = -1*np.cos(dip*np.pi/180.0)
-                n = [n1, n2, n3]
-                u1 = np.cos(rake*np.pi/180.0)*np.cos(strike*np.pi/180.0) + np.cos(dip*np.pi/180.0)*np.sin(rake*np.pi/180.0)*np.sin(strike*np.pi/180.0)
-                u2 = np.cos(rake*np.pi/180.0)*np.sin(strike*np.pi/180.0) - np.cos(dip*np.pi/180.0)*np.sin(rake*np.pi/180.0)*np.cos(strike*np.pi/180.0)
-                u3 = -1*np.sin(rake*np.pi/180.0)*np.sin(dip*np.pi/180.0)
-                u = [u1, u2, u3]
+                n1 = -np.sin(np.radians(dip)) * np.sin(np.radians(strike))
+                n2 = np.sin(np.radians(dip)) * np.cos(np.radians(strike))
+                n3 = -np.cos(np.radians(dip))
+                n = np.array([n1, n2, n3])
+                u1 = (np.cos(np.radians(rake)) * np.cos(np.radians(strike)) +
+                    np.cos(np.radians(dip)) * np.sin(np.radians(rake)) * np.sin(np.radians(strike)))
+                u2 = (np.cos(np.radians(rake)) * np.sin(np.radians(strike)) -
+                    np.cos(np.radians(dip)) * np.sin(np.radians(rake)) * np.cos(np.radians(strike)))
+                u3 = -np.sin(np.radians(rake)) * np.sin(np.radians(dip))
+                u = np.array([u1, u2, u3])
                 P_osa = np.subtract(n, u) / np.linalg.norm(np.subtract(n, u))
                 T_osa = np.add(n, u) / np.linalg.norm(np.add(n, u))
                 if P_osa[2] > 0:
                     P_osa = -P_osa
+                if T_osa[2] > 0:
+                    T_osa = -T_osa
+                if P_osa[2] > 0:
                     correctP = 0
                 else:
                     correctP = 180
                 if T_osa[2] > 0:
-                    T_osa = -T_osa
                     correctT = 0
                 else:
                     correctT = 180
-                P_theta = 90.0 - np.degrees(np.arccos(np.abs(P_osa[2])))
-                T_theta = 90.0 - np.degrees(np.arccos(np.abs(T_osa[2])))
-                P_azimuth = (correctP + (np.degrees(np.arctan2(P_osa[1], P_osa[0])) + 360.0)) % 360.0
+                P_theta = np.degrees(np.arcsin(abs(P_osa[2])))
+                T_theta = np.degrees(np.arcsin(abs(T_osa[2])))
+                P_azimuth = (correctP + (np.degrees(np.arctan2((P_osa[1]), P_osa[0])) + 360.0)) % 360.0
                 T_azimuth = (correctT + (np.degrees(np.arctan2(T_osa[1], T_osa[0])) + 360.0)) % 360.0
                 if P_theta>=52 and T_theta<=35:
                     kin='NF'
