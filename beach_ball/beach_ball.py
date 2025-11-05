@@ -373,10 +373,13 @@ class BeachBall:
                 u = np.array([u1, u2, u3])
                 P_osa = np.subtract(n, u) / np.linalg.norm(np.subtract(n, u))
                 T_osa = np.add(n, u) / np.linalg.norm(np.add(n, u))
+                B_osa = np.cross(T_osa, P_osa) / np.linalg.norm(np.cross(T_osa, P_osa))
                 if P_osa[2] > 0:
                     P_osa = -P_osa
                 if T_osa[2] > 0:
                     T_osa = -T_osa
+                if B_osa[2] > 0:
+                    B_osa = -B_osa
                 if P_osa[2] > 0:
                     correctP = 0
                 else:
@@ -385,10 +388,27 @@ class BeachBall:
                     correctT = 0
                 else:
                     correctT = 180
+                if B_osa[2] > 0:
+                    correctB = 0
+                else:
+                    correctB = 180
                 P_theta = np.degrees(np.arcsin(abs(P_osa[2])))
                 T_theta = np.degrees(np.arcsin(abs(T_osa[2])))
+                B_theta = np.degrees(np.arcsin(abs(B_osa[2])))
                 P_azimuth = (correctP + (np.degrees(np.arctan2((P_osa[1]), P_osa[0])) + 360.0)) % 360.0
                 T_azimuth = (correctT + (np.degrees(np.arctan2(T_osa[1], T_osa[0])) + 360.0)) % 360.0
+                B_azimuth = (correctB + (np.degrees(np.arctan2((B_osa[1]), B_osa[0])) + 360.0)) % 360.0
+                SH_p = P_osa
+                SH_p[2] = 0
+                SH_t = T_osa
+                SH_t[2] = 0
+                if np.linalg.norm(SH_p) >= np.linalg.norm(SH_t):
+                    SH = SH_p
+                else:
+                    SH = SH_t
+                SH /= np.linalg.norm(SH)
+                y, x, _ = SH / np.linalg.norm(SH)
+                SHmax = np.degrees(np.arctan2(x, y)) % 360
                 if P_theta>=52 and T_theta<=35:
                     kin='NF'
                     col = NF_col
