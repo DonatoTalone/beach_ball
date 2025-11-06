@@ -1,4 +1,9 @@
-# beach_ball - a Qgis plugin
+# beach_ball - a Qgis plugin for focal mechanisms visualization
+
+**PLEASE NOTE THAT THIS IS A FORK FOR EXERIMENTAL FEATURES.**
+**THE MAIN OFFICIAL RELEASE OF THE PLUGIN IS:**
+
+**[GeoSeisUtilities - FromEarthToEarth Laboratory / beach_ball · GitLab](https://gitlab.com/GeoSeisUtilities/beach_ball)**
 
 **beach_ball** is a Qgis plugin written in Python for representing focal mechanisms in map as beachballs.
 

@@ -320,6 +320,24 @@ class BeachBall:
             clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
             clone_layer.updateFields()
             id_Tplunge= clone_layer.dataProvider().fieldNameIndex(field_name)
+            field_name = "Btrend"
+            while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
+                field_name = field_name +'_'
+            clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
+            clone_layer.updateFields()
+            id_Btrend= clone_layer.dataProvider().fieldNameIndex(field_name)
+            field_name = "Bplunge"
+            while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
+                field_name = field_name +'_'
+            clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
+            clone_layer.updateFields()
+            id_Bplunge= clone_layer.dataProvider().fieldNameIndex(field_name)
+            field_name = "SHmax"
+            while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
+                field_name = field_name +'_'
+            clone_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
+            clone_layer.updateFields()
+            id_SHmax= clone_layer.dataProvider().fieldNameIndex(field_name)
             field_name = "SVGpath"
             while clone_layer.dataProvider().fieldNameIndex(field_name) != -1:
                 field_name = field_name +'_'
@@ -415,10 +433,10 @@ class BeachBall:
                 elif P_theta>=40 and P_theta<52 and T_theta<=20:
                     kin='NS'
                     col = NS_col
-                elif P_theta<40 and T_theta<=20:
+                elif P_theta<40 and T_theta<=20 and B_theta>=45:
                     kin='SS'
                     col = SS_col
-                elif P_theta<=20 and T_theta<40:
+                elif P_theta<=20 and T_theta<40 and B_theta>=45:
                     kin='SS'
                     col = SS_col
                 elif P_theta<=20 and T_theta>=40 and T_theta<52:
@@ -448,11 +466,26 @@ class BeachBall:
                         T_theta = None
                     else:
                         T_theta = float(T_theta)
+                    if B_azimuth == val or float(B_azimuth) == val:
+                        B_azimuth = None
+                    else:
+                        B_azimuth = float(B_azimuth)
+                    if B_theta == val or float(B_theta) == val:
+                        B_theta = None
+                    else:
+                        B_theta = float(B_theta)
+                    if SHmax == val or float(SHmax) == val:
+                        SHmax = None
+                    else:
+                        SHmax = float(SHmax)
                 clone_layer.changeAttributeValue(feature.id(), id_new_col, kin)
                 clone_layer.changeAttributeValue(feature.id(), id_Ptrend, round(P_azimuth,2))
                 clone_layer.changeAttributeValue(feature.id(), id_Pplunge, round(P_theta,2))
                 clone_layer.changeAttributeValue(feature.id(), id_Ttrend, round(T_azimuth,2))
                 clone_layer.changeAttributeValue(feature.id(), id_Tplunge, round(T_theta,2))
+                clone_layer.changeAttributeValue(feature.id(), id_Btrend, round(B_azimuth,2))
+                clone_layer.changeAttributeValue(feature.id(), id_Bplunge, round(B_theta,2))
+                clone_layer.changeAttributeValue(feature.id(), id_SHmax, round(SHmax,2))
                 # Plotting beachball
                 svg_file = f'{output_path}/bb_svg/{id_v}.svg'
                 clone_layer.changeAttributeValue(feature.id(), id_svg_col, svg_file)
