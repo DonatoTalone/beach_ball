@@ -6,30 +6,31 @@
 name=BeachBall
 qgisMinimumVersion=3.0
 description=This plugin creates beachball to represent focal mechanisms from strike, dip, and rake.
-version=0.1
+version=1.0
 author=GeoSeisUtilities
-email=zazo.dt@gmail.com
+email=geoseisutilities@libero.it
 
-about=This plugin read the strike, dip, and rake information and build the corresponding beachball for representing the focal mechanisms. Images are coloured according to the kinematics, following the classification of Zoback (1992)
+about=This plugin read the strike, dip, and rake information and build the corresponding beachball for representing the focal mechanisms. Obspy module is used for producing the SVGs. Images are coloured according to the kinematics, following the classification of Zoback (1992). Colors can be changed from the UI. The plugin also add P-T-B attitudes and SHmax azimuth in the attribute table.
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://gitlab.com/GeoSeisUtilities/beach_ball/-/issues/new?type=ISSUE
+repository=https://gitlab.com/GeoSeisUtilities/beach_ball
 # End of mandatory metadata
 
 # Recommended items:
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-# changelog=
+changelog=1.0 - First stable release
+    0.1 - First testing release
 
 # Tags are comma separated with spaces allowed
-tags=python
+tags=python, beachball, FocalMechanism, FaultPlaneSolution, FM, kinematics, fault, seismicity
 
-homepage=http://homepage
+# homepage=
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
@@ -40,7 +41,7 @@ deprecated=False
 # plugin_dependencies=
 
 Category of the plugin: Raster, Vector, Database or Web
-# category=
+category=Vector
 
 # If the plugin can run on QGIS Server.
 server=False
